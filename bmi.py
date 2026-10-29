@@ -1,4 +1,13 @@
+import json
+import os
+
+FILENAME = "bmi_records.json"
+
 records = []
+
+if os.path.exists(FILENAME):
+    with open(FILENAME, "r", encoding="utf-8") as f:
+        records = json.load(f)
 
 red = "\033[91m"
 green = "\033[92m"
@@ -97,6 +106,9 @@ while True:
         r['weight'] = weight
         r['bmi'] = bmi
         records.append(r)
+        
+        with open(FILENAME, "w", encoding="utf-8") as f:
+            json.dump(records, f, ensure_ascii=False, indent=4)
     
     elif choice == "2":
         if len(records) == 0:
@@ -173,10 +185,14 @@ while True:
                 print(f"{'Date':<12}{'Name':<12}{'Height':<12}{'Weight':<12}{'BMI':<12}")
                 print("-" * 60)
                 for r in sorted_records:
-                    print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['BMI']:<12.2f}\n")
+                    print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['bmi']:<12.2f}\n")
                             
     elif choice == "6":
         records.clear()
+        
+        with open(FILENAME, "w", encoding="utf-8") as f:
+            json.dump(records, f, ensure_ascii=False, indent=4)
+            
         print(f"{yellow}All records have been cleared!{color_reset}\n")
         
     elif choice == "7":
