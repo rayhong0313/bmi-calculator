@@ -8,15 +8,15 @@ purple = "\033[95m"
 color_reset = "\033[0m"
 
 while True:
-    print(f"{blue}======BMI Calculator======{color_reset}")
+    print(f"{blue}====== BMI Calculator ======{color_reset}")
     print(f"{blue}1.Enter your information{color_reset}")
     print(f"{blue}2.View history{color_reset}")
     print(f"{blue}3.Search records by name{color_reset}")
-    print(f"{blue}4.{color_reset}")
+    print(f"{blue}4.Sort records{color_reset}")
     print(f"{red}6.Clear all records{color_reset}")
     print(f"{red}7.Quit{color_reset}")
-    print(f"{blue}   Enter number 1 to 7{color_reset}")
-    print(f"{blue}={color_reset}" * 26)
+    print(f"{blue}   Enter number 1 to 7{color_reset}") 
+    print(f"{blue}={color_reset}" * 28)
     
     choice = input("Enter the option you want: ").strip()
     print("")
@@ -132,7 +132,49 @@ while True:
                     
             else:
                 print("")
+
+    elif choice == "4":
+        if len(records) == 0:
+            print(f"{yellow}No records found yet!{color_reset}\n")
+        else:
+            while True:
+                print("")
+                print(f"{blue}====== Sort Option ======={color_reset}")
+                print(f"{blue}1.Sort by date(earliest to lastest){color_reset}")
+                print(f"{blue}2.Sort by BMI(lowest to highest){color_reset}")
+                print(f"{blue}3.Sort by BMI(highest to lowest){color_reset}")
+                print(f"{blue}4.Back to main menu{color_reset}")
+                print(f"{blue}={color_reset}" * 28)
                 
+                sort_choice = input("Enter the option you want: ").strip()
+                
+                if sort_choice == "1":
+                    sorted_records = sorted(records, key=lambda x: x['date']) # dict沒法排序 所以要先把records的每一個dict暫時命名為x x['date']就是把date這個欄位的值抽出來
+                    print(f"{green}---- Sorted by date(earliest to lastest) ----{color_reset}\n")
+                    break
+                    
+                elif sort_choice == "2":
+                    sorted_records = sorted(records, key=lambda x: x['bmi'])
+                    print(f"{green}---- Sorted by BMI(lowest to highest) ----{color_reset}\n")
+                    break
+                    
+                elif sort_choice == "3":
+                    sorted_records = sorted(records, key=lambda x: x['bmi'], reverse = True)
+                    print(f"{green}---- Sorted by BMI(highest to lowest) ----{color_reset}\n")
+                    break
+
+                elif sort_choice == "4":
+                    break
+                
+                else:
+                    print(f"{red}Invaild option! Please try again.{color_reset}\n")
+                    
+            if sort_choice in ["1", "2", "3"]: # ["1", "2", "3"]是多個選項 所以不能用==    
+                print(f"{'Date':<12}{'Name':<12}{'Height':<12}{'Weight':<12}{'BMI':<12}")
+                print("-" * 60)
+                for r in sorted_records:
+                    print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['BMI']:<12.2f}\n")
+                            
     elif choice == "6":
         records.clear()
         print(f"{yellow}All records have been cleared!{color_reset}\n")
