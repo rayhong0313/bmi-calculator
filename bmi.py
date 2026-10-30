@@ -22,6 +22,7 @@ while True:
     print(f"{blue}2.View history{color_reset}")
     print(f"{blue}3.Search records by name{color_reset}")
     print(f"{blue}4.Sort records{color_reset}")
+    print(f"{blue}5.Delete a record{color_reset}")
     print(f"{red}6.Clear all records{color_reset}")
     print(f"{red}7.Quit{color_reset}")
     print(f"{blue}   Enter number 1 to 7{color_reset}") 
@@ -93,11 +94,19 @@ while True:
         print(f"{green}Your BMI is: {bmi:.2f}{color_reset}")
         
         if bmi < 18.5:
-            print(f"{yellow}Too thin{color_reset}\n")
-        elif bmi > 18.5 and bmi < 24:
-            print(f"{green}Normal{color_reset}\n")
+            category = (f"{yellow}Underweight{color_reset}")
+        elif bmi < 24:
+            category = (f"{green}Normal{color_reset}")
+        elif bmi < 27:
+            category = (f"{yellow}Overweight{color_reset}")
+        elif bmi < 30:
+            category = (f"{yellow}Mild obesity{color_reset}")
+        elif bmi < 35:
+            category = (f"{yellow}Moderate obesity{color_reset}")
         else:
-            print(f"{red}Overweight{color_reset}\n")
+            category = (f"{yellow}Severe obesity{color_reset}")
+        
+        print(f"Your BMI category is: {category}\n")
         
         r = {}
         r['date'] = date
