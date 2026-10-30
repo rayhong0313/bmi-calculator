@@ -1,0 +1,6 @@
+bmi_records.json
+
+git rm --cached bmi_records.json
+git add .gitignore
+git commit -m "Stop tracking personal BMI records"
+git push
