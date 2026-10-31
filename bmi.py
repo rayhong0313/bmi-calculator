@@ -3,19 +3,39 @@ import os
 
 FILENAME = "bmi_records.json"
 
-records = []
-
-if os.path.exists(FILENAME):
-    with open(FILENAME, "r", encoding="utf-8") as f:
-        if os.path.getsize(FILENAME):
-            records = json.load(f)
-
 red = "\033[91m"
 green = "\033[92m"
 yellow = "\033[93m"
 blue = "\033[94m"
 purple = "\033[95m"
 color_reset = "\033[0m"
+
+
+def load_records():
+    if os.path.exists(FILENAME):
+         if os.path.getsize(FILENAME) > 0:
+            with open(FILENAME, "r", encoding="utf-8") as f:
+                return json.load(f)
+    
+    return []
+
+def save_records(records):
+    with open(FILENAME, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=4)
+
+def display_records(records):
+    if not records:
+        print(f"{yellow}No records found yet!{color_reset}\n")
+        return
+
+    print(f"{'Date':<12}{'Name':<12}{'Height':<12}{'Weight':<12}{'BMI':<12}")
+    print("-" * 60)
+    
+    for r in records:
+        print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['bmi']:<12.2f}")
+    print("")
+    
+records = load_records()
 
 while True:
     print(f"{blue}====== BMI Calculator ======{color_reset}")
@@ -118,20 +138,10 @@ while True:
         r['bmi'] = bmi
         records.append(r)
         
-        with open(FILENAME, "w", encoding="utf-8") as f:
-            json.dump(records, f, ensure_ascii=False, indent=4)
-    
+        save_records(records)
+        
     elif choice == "2":
-        if len(records) == 0:
-            print(f"{yellow}No records found yet!{color_reset}")
-        else:
-            print(f"{'Date':<12}{'Name':<12}{'Height':<12}{'Weight':<12}{'BMI':<12}")
-            print("-" * 60)
-            
-            for r in records: # 從records中 一筆一筆拿出來
-                print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['bmi']:<12.2f}")
-            
-        print("")
+        display_records(records)
                 
     elif choice == "3":
         if len(records) == 0:
@@ -235,9 +245,8 @@ while True:
     elif choice == "6":
         records.clear()
         
-        with open(FILENAME, "w", encoding="utf-8") as f:
-            json.dump(records, f, ensure_ascii=False, indent=4)
-            
+        save_records(records)
+        
         print(f"{yellow}All records have been cleared!{color_reset}\n")
         
     elif choice == "7":
