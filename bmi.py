@@ -10,18 +10,20 @@ blue = "\033[94m"
 purple = "\033[95m"
 color_reset = "\033[0m"
 
-
 def load_records():
     if os.path.exists(FILENAME):
          if os.path.getsize(FILENAME) > 0:
             with open(FILENAME, "r", encoding="utf-8") as f:
-                return json.load(f)
+                return json.load(f) # return後面是def的會執行的函式
     
     return []
 
 def save_records(records):
     with open(FILENAME, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=4)
+        
+def calculate_bmi(height, weight):
+    return weight / height ** 2
 
 def display_records(records):
     if not records:
@@ -35,17 +37,134 @@ def display_records(records):
         print(f"{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['bmi']:<12.2f}")
     print("")
     
+def edit_records(records):
+    if not records:
+        print(f"{yellow}No records found yet!{color_reset}")
+        return
+    
+    print(f"{'No':<6}{'Date':<12}{'Name':12}{'Height':<12}{'Weight':<12}{'BMI':<12}")
+    print("-" * 66)
+    
+    for i, r in enumerate(records, start=1):
+        print(f"{i:<6}{r['date']:<12}{r['name']:<12}{r['height']:<12.2f}{r['weight']:<12.1f}{r['bmi']:<12.2f}")
+        
+    choice = input("\nEnter the record number you want to edit: ").strip()
+    
+    if not choice:
+        print(f"\n{red}Please enter a valid number!{color_reset}\n")
+        return
+    
+    index = int(choice) - 1
+    
+    if not 0 <= index <= len(records):
+        print(f"\n{red}Invalid record number!{color_reset}\n")
+        return
+    
+    record = records[index]
+    
+    while True:
+        print(f"{blue}====== Edit Option ======{color_reset}")
+        print(f"{blue}1. Edit Date{color_reset}")
+        print(f"{blue}2. Edit Name{color_reset}")
+        print(f"{blue}3. Edit Height{color_reset}")
+        print(f"{blue}4. Edit Weight{color_reset}")
+        print(f"{blue}5. Back{color_reset}")
+        print(f"{blue}={color_reset}" * 28)
+        
+        edit_choice = input("\nSelect an option: ").strip()
+        
+        if edit_choice == "1":
+            new_date = input("Enter new date (MMDD): ").strip()
+            
+            if len(new_date) == 4 and new_date.isdigit():
+                month = new_date[:2]
+                day = new_date[2:]
+                
+                days_in_month = {
+                    "01": 31, "02": 28, "03": 31, "04": 30,
+                    "05": 31, '06': 30, "07": 31, "08": 31,
+                    "09": 30, "10": 31, "11": 30, "12": 31
+                }
+                
+                if month in days_in_month and 1 <= day <= days_in_month[month]:
+                    record['date'] = new_date
+                    
+                else:
+                    print(f"{red}Invalid date!{color_reset}")
+                    continue # 回到 while True:
+                
+            else:
+                print(f"{red}Invalid date format!{color_reset}")
+                continue
+                
+        elif edit_choice == "2":
+            new_name = input("\nEnter new name: ").strip()
+            
+            if new_name and all(char.isalpha() or char == " " for char in name):
+                record['name'] = new_name
+                
+            else:
+                print(f"{red}Invalid name!{color_reset}")
+                continue
+            
+        elif edit_choice == "3":
+            new_height = input("\nEnter new height (m): ").strip()
+            
+            if new_height.replace(".", "", 1).isdigit():
+                new_height = float(new_height)
+                
+                if 0.5 < new_height < 2.5:
+                    record['height'] = new_height
+                    record['bmi'] = calculate_bmi(record['height'], record['weight'])
+                    
+                else:
+                    print(f"{red}Invalid height!{color_reset}")
+                    continue
+                
+            else:
+                print(f"{red}Please enter a valid number!{color_reset}")
+                continue
+            
+        elif edit_choice == "4":
+            new_weight = input("\nEnter new weight (kg): ").strip()
+            
+            if new_weight.replace(".", "", 1).isdigit():
+                new_weight = float(new_weight)
+                
+                if 20 < new_weight < 300:
+                    record['weight'] = new_weight
+                    record['bmi'] = calculate_bmi(record['height'], record['weight'])
+                    
+                else:
+                    print(f"{red}Invalid weight!{color_reset}")
+                    continue
+                    
+            else:
+                print(f"{red}Please enter a valid number!{color_reset}")
+                continue
+            
+        elif edit_choice == "5":
+            break
+        
+        else:
+            print(f"{red}Invalid option!{color_reset}\n")
+            continue
+            
+        save_records(records)
+        print(f"{green}---- Record updated successfully! ----{color_reset}")
+                    
 records = load_records()
 
 while True:
     print(f"{blue}====== BMI Calculator ======{color_reset}")
-    print(f"{blue}1.Enter Your Information{color_reset}")
-    print(f"{blue}2.View History{color_reset}")
-    print(f"{blue}3.Search Records{color_reset}")
-    print(f"{blue}4.Sort Records{color_reset}")
-    print(f"{blue}5.Delete A Record{color_reset}")
-    print(f"{red}6.Clear All Records{color_reset}")
-    print(f"{red}7.Quit{color_reset}")
+    print(f"{blue}1. Enter Your Information{color_reset}")
+    print(f"{blue}2. View History{color_reset}")
+    print(f"{blue}3. Search Records{color_reset}")
+    print(f"{blue}4. Sort Records{color_reset}")
+    print(f"{blue}5. Edit A Record{color_reset}")
+    print(f"{blue}6. Delete A Record{color_reset}")
+    print(f"{red}7. lear All Records{color_reset}")
+    print(f"{red}8. Quit{color_reset}")
     print(f"{blue}   Enter number 1 to 7{color_reset}") 
     print(f"{blue}={color_reset}" * 28)
     
@@ -110,7 +229,7 @@ while True:
             else:
                 print(f"\n{red}Enter the correct number, please!(if your weight is 60 kg. Enter 60.){color_reset}\n")
         
-        bmi = weight / height ** 2
+        bmi = calculate(height, weight)
         
         print("")
         print(f"{green}Your BMI is: {bmi:.2f}{color_reset}")
@@ -175,10 +294,10 @@ while True:
             while True:
                 print("")
                 print(f"{blue}====== Sort Option ======={color_reset}")
-                print(f"{blue}1.Sort by date(Earliest to Lastest){color_reset}")
-                print(f"{blue}2.Sort by BMI(Lowest to Highest){color_reset}")
-                print(f"{blue}3.Sort by BMI(Highest to Lowest){color_reset}")
-                print(f"{blue}4.Back to main menu{color_reset}")
+                print(f"{blue}1. Sort by Date(Earliest to Lastest){color_reset}")
+                print(f"{blue}2. Sort by BMI(Lowest to Highest){color_reset}")
+                print(f"{blue}3. Sort by BMI(Highest to Lowest){color_reset}")
+                print(f"{blue}4. Back to Main Menu{color_reset}")
                 print(f"{blue}={color_reset}" * 28)
                 
                 sort_choice = input("\nEnter the option you want: ").strip()
@@ -214,6 +333,9 @@ while True:
             print("")
             
     elif choice == "5":
+        edit_records(records)
+            
+    elif choice == "6":
         if len(records) == 0:
             print(f"{yellow}No records found yet!{color_reset}\n")
         else:
@@ -231,8 +353,7 @@ while True:
                 if 1 <= delete_index <= len(records):
                     del records[delete_index - 1]
                     
-                    with open(FILENAME, "w", encoding="utf-8") as f:
-                        json.dump(records, f, ensure_ascii=False, indent=4)
+                    save_records(records)
                         
                     print(f"\n{green}---- Record deleted successfully! ----{color_reset}\n")
                     
@@ -242,14 +363,14 @@ while True:
             else:
                 print(f"\n{red}Please enter a valid number!{color_reset}\n")
     
-    elif choice == "6":
+    elif choice == "7":
         records.clear()
         
         save_records(records)
         
         print(f"{yellow}All records have been cleared!{color_reset}\n")
         
-    elif choice == "7":
+    elif choice == "8":
         print(f"{blue}Goodbye!{color_reset}\n")
         break
     
